@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Conversation Order Verification</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .test { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+        .pass { background: #d4edda; }
+        .fail { background: #f8d7da; }
+        button { padding: 10px 20px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>Conversation Order Test</h1>
+    
+    <div id="test1" class="test">
+        <h2>Test 1: Check Array Order</h2>
+        <button onclick="runTest1()">Run Test 1</button>
+        <pre id="test1-result"></pre>
+    </div>
+    
+    <div id="test2" class="test">
+        <h2>Test 2: Simulate Message Flow</h2>
+        <button onclick="runTest2()">Run Test 2</button>
+        <pre id="test2-result"></pre>
+    </div>
+    
+    <div id="test3" class="test">
+        <h2>Test 3: Backend Communication</h2>
+        <button onclick="runTest3()">Run Test 3</button>
+        <pre id="test3-result"></pre>
+    </div>
+    
+    <script>
+        function runTest1() {
+            const result = document.getElementById('test1-result');
+            result.textContent = 'Testing array push order...\n\n';
+            
+            let history = [];
+            
+            // Simulate what our code does
+            result.textContent += 'history.push({ role: "user", content: "Question?" });\n';
+            history.push({ role: "user", content: "Question?" });
+            
+            result.textContent += 'history.push({ role: "assistant", content: "Answer." });\n\n';
+            history.push({ role: "assistant", content: "Answer." });
+            
+            result.textContent += 'Result:\n';
+            history.forEach((msg, i) => {
+                result.textContent += `[${i}] ${msg.role}: ${msg.content}\n`;
+            });
+            
+            // Check order
+            const correct = history[0].role === 'user' && history[1].role === 'assistant';
+            document.getElementById('test1').className = correct ? 'test pass' : 'test fail';
+            result.textContent += `\n${correct ? '✓ PASS' : '✗ FAIL'}: Order is ${correct ? 'correct' : 'WRONG'}`;
+        }
+        
+        function runTest2() {
+            const result = document.getElementById('test2-result');
+            result.textContent = 'Simulating actual message flow...\n\n';
+            
+            let conversationHistory = [];
+            
+            // First message
+            result.textContent += '1. User sends first message\n';
+            const userInput1 = "What's the weather in SF?";
+            
+            // What gets sent to backend
+            const config1 = {
+                conversation_history: conversationHistory,  // Empty
+                current_message: userInput1
+            };
+            result.textContent += `   Sent: conversation_history=${JSON.stringify(config1.conversation_history)}\n`;
+            result.textContent += `         current_message="${config1.current_message}"\n\n`;
+            
+            // Simulate response
+            const response1 = "Weather in SF: 18°C, foggy";
+            
+            // Update history AFTER response (like our code does)
+            conversationHistory.push({ role: 'user', content: userInput1 });
+            conversationHistory.push({ role: 'assistant', content: response1 });
+            
+            result.textContent += '2. After first exchange:\n';
+            conversationHistory.forEach((msg, i) => {
+                result.textContent += `   [${i}] ${msg.role}: ${msg.content}\n`;
+            });
+            
+            // Second message
+            result.textContent += '\n3. User sends second message\n';
+            const userInput2 = "How about LA?";
+            
+            const config2 = {
+                conversation_history: conversationHistory,
+                current_message: userInput2
+            };
+            
+            result.textContent += '   conversation_history sent to backend:\n';
+            config2.conversation_history.forEach((msg, i) => {
+                result.textContent += `     [${i}] ${msg.role}: ${msg.content}\n`;
+            });
+            
+            // Check order
+            const correct = conversationHistory[0].role === 'user';
+            document.getElementById('test2').className = correct ? 'test pass' : 'test fail';
+            result.textContent += `\n${correct ? '✓ PASS' : '✗ FAIL'}: Messages in chronological order`;
+        }
+        
+        async function runTest3() {
+            const result = document.getElementById('test3-result');
+            result.textContent = 'Testing actual backend...\n\n';
+            
+            try {
+                // Check what a real prompt looks like
+                const testConfig = {
+                    model_identity: "Test",
+                    knowledge_cutoff: "2024-06",
+                    current_date: "2025-08-15",
+                    reasoning_level: "high",
+                    instructions: "Test",
+                    tools: [],
+                    conversation_history: [
+                        { role: "user", content: "First question?" },
+                        { role: "assistant", content: "First answer." },
+                        { role: "user", content: "Second question?" },
+                        { role: "assistant", content: "Second answer." }
+                    ],
+                    current_message: "Third question?",
+                    max_tokens: 100,
+                    temperature: 0.7
+                };
+                
+                const response = await fetch('/api/render_prompt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testConfig)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.textContent += 'Prompt structure:\n';
+                    
+                    // Extract message order from prompt
+                    const prompt = data.prompt;
+                    const messages = prompt.split('<|start|>').filter(s => s.includes('<|message|>'));
+                    
+                    messages.forEach((msg, i) => {
+                        const role = msg.includes('user<|message|>') ? 'user' : 
+                                     msg.includes('assistant<|message|>') ? 'assistant' : 'system';
+                        const content = msg.split('<|message|>')[1]?.split('<|end|>')[0]?.trim().substring(0, 30) || '';
+                        if (content) {
+                            result.textContent += `   ${role}: ${content}...\n`;
+                        }
+                    });
+                    
+                    // Check if messages appear in correct order
+                    const correct = prompt.indexOf('First question') < prompt.indexOf('First answer') &&
+                                  prompt.indexOf('First answer') < prompt.indexOf('Second question') &&
+                                  prompt.indexOf('Second question') < prompt.indexOf('Second answer') &&
+                                  prompt.indexOf('Second answer') < prompt.indexOf('Third question');
+                    
+                    document.getElementById('test3').className = correct ? 'test pass' : 'test fail';
+                    result.textContent += `\n${correct ? '✓ PASS' : '✗ FAIL'}: Backend preserves chronological order`;
+                } else {
+                    result.textContent += 'Error: ' + data.error;
+                    document.getElementById('test3').className = 'test fail';
+                }
+            } catch (e) {
+                result.textContent += 'Exception: ' + e.message;
+                document.getElementById('test3').className = 'test fail';
+            }
+        }
+    </script>
+</body>
+</html>
