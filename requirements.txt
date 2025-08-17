@@ -1,0 +1,35 @@
+# Core dependencies
+flask==3.0.0
+flask-cors==4.0.0
+aiohttp==3.9.1
+python-dotenv==1.0.0
+
+# AI/ML dependencies
+openai==1.12.0
+vllm>=0.3.0
+
+# Browser automation
+selenium==4.15.0
+helium==3.0.9
+pillow==10.1.0
+
+# Docker support for Python sandbox
+docker==7.0.0
+
+# Browser profile support
+undetected-chromedriver==3.5.5
+
+# Utilities
+requests==2.31.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# Development dependencies
+pytest==7.4.3
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
+
+# Optional performance dependencies
+uvicorn==0.24.0
+gunicorn==21.2.0
