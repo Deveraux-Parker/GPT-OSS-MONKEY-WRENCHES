@@ -20,24 +20,11 @@ A Flask web application that demonstrates the OpenAI Harmony format with VLLM ba
 
 ## Installation
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/harmonytesting.git
-cd harmonytesting
-```
+Clone the repository
 
-2. Create a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+Install dependencies:
 
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-4. Install ChromeDriver:
+Install ChromeDriver:
 ```bash
 # On Ubuntu/Debian
 sudo apt-get update
@@ -49,7 +36,7 @@ brew install chromedriver
 # Or download manually from https://chromedriver.chromium.org/
 ```
 
-5. Pull Docker Python image (for sandboxed execution):
+Pull Docker Python image (for sandboxed execution):
 ```bash
 docker pull python:3.11-slim
 ```
