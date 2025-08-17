@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HARMONY System - Educational Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 1.3em;
+            color: #b3d9ff;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .tool-selector {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+        }
+
+        .tool-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .tool-card.active {
+            background: rgba(255,255,255,0.2);
+            border-color: #4fc3f7;
+            box-shadow: 0 0 20px rgba(79,195,247,0.5);
+        }
+
+        .tool-card .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .tool-card h3 {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+
+        .tool-card p {
+            font-size: 0.9em;
+            color: #b3d9ff;
+        }
+
+        .demo-area {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .demo-area.active {
+            display: block;
+        }
+
+        .flow-visualization {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .flow-step {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 12px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        .flow-step:nth-child(1) { animation-delay: 0.1s; }
+        .flow-step:nth-child(2) { animation-delay: 0.2s; }
+        .flow-step:nth-child(3) { animation-delay: 0.3s; }
+        .flow-step:nth-child(4) { animation-delay: 0.4s; }
+
+        .flow-step h4 {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #4fc3f7;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-number {
+            background: #4fc3f7;
+            color: #1e3c72;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .code-block {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-top: 15px;
+        }
+
+        .code-block.prompt {
+            background: rgba(0,0,0,0.4);
+            border-color: #4fc3f7;
+        }
+
+        .prompt-display {
+            background: rgba(0,0,0,0.5);
+            border: 2px solid #4fc3f7;
+            border-radius: 12px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .prompt-header {
+            background: rgba(79,195,247,0.2);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(79,195,247,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prompt-header h5 {
+            margin: 0;
+            color: #4fc3f7;
+            font-size: 1.1em;
+        }
+
+        .token-count {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            color: #ffd54f;
+        }
+
+        .prompt-content {
+            padding: 20px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .prompt-tag {
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        .prompt-section {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            white-space: pre-wrap;
+        }
+
+        .prompt-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .highlight {
+            color: #4fc3f7;
+            font-weight: bold;
+        }
+
+        .channel-tag {
+            color: #ffd54f;
+        }
+
+        .tool-definition {
+            background: rgba(79,195,247,0.1);
+            border: 1px solid rgba(79,195,247,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .result-display {
+            background: rgba(76,175,80,0.1);
+            border: 1px solid rgba(76,175,80,0.3);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .arrow-down {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 24px;
+            color: #4fc3f7;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .info-box {
+            background: rgba(255,255,255,0.05);
+            border-left: 4px solid #4fc3f7;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .info-box h5 {
+            color: #4fc3f7;
+            margin-bottom: 10px;
+        }
+
+        .loading-animation {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #4fc3f7;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .channel-breakdown {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid rgba(79,195,247,0.3);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .channel-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4fc3f7;
+        }
+
+        .channel-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .channel-section h5 {
+            color: #4fc3f7;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .channel-icon {
+            background: rgba(79,195,247,0.2);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .channel-content {
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+
+        .tool-execution {
+            background: rgba(76,175,80,0.1);
+            border: 1px solid rgba(76,175,80,0.3);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+
+        .tool-call {
+            color: #ffd54f;
+        }
+
+        .tool-result {
+            color: #81c784;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+            
+            .tool-selector {
+                gap: 15px;
+            }
+            
+            .tool-card {
+                min-width: 150px;
+                padding: 20px;
+            }
+            
+            .demo-area {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>HARMONY System</h1>
+            <p>Understanding OpenAI's Structured Generation System Through Interactive Examples</p>
+            <div style="margin-top: 30px;">
+                <p style="font-size: 1.1em; color: #ffd54f;">✨ Click on any tool below to explore how HARMONY works!</p>
+            </div>
+        </header>
+
+        <div class="tool-selector">
+            <div class="tool-card" onclick="showDemo('python')" id="python-card">
+                <div class="icon">🐍</div>
+                <h3>Python Tool</h3>
+                <p>Execute Python code in a secure Docker environment</p>
+            </div>
+            
+            <div class="tool-card" onclick="showDemo('weather')" id="weather-card">
+                <div class="icon">🌤️</div>
+                <h3>Weather Tool</h3>
+                <p>Get current weather information for any location</p>
+            </div>
+            
+            <div class="tool-card" onclick="showDemo('browser')" id="browser-card">
+                <div class="icon">🌐</div>
+                <h3>Vision Browser</h3>
+                <p>Navigate and extract content from websites</p>
+            </div>
+        </div>
+
+        <!-- Python Tool Demo -->
+        <div class="demo-area" id="python-demo">
+            <h2>Python Tool: Rolling a D20 Dice</h2>
+            
+            <div class="info-box">
+                <h5>About the Python Tool</h5>
+                <p>The Python tool allows the model to execute Python code in a secure, sandboxed Docker environment. This ensures safe code execution while providing powerful computational capabilities.</p>
+            </div>
+
+            <div class="flow-visualization">
+                <div class="flow-step">
+                    <h4><span class="step-number">1</span> Initial LLM Call</h4>
+                    <p>The user asks the model to roll a D20 dice using Python:</p>
+                    
+                    <div class="prompt-display">
+                        <div class="prompt-header">
+                            <h5>Initial Prompt</h5>
+                            <span class="token-count">227 tokens</span>
+                        </div>
+                        <div class="prompt-content">
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;system&lt;|message|&gt;</span>You are ChatGPT, a large language model trained by OpenAI.
+Knowledge cutoff: 2024-06
+Current date: 2025-08-17
+
+Reasoning: high
+
+# Valid channels: analysis, commentary, final. Channel must be included for every message.
+Calls to these tools must go to the commentary channel: 'functions'.<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;developer&lt;|message|&gt;</span># Instructions
+
+Use a friendly tone and be helpful.
+
+# Tools
+
+## functions
+
+namespace functions {
+
+// Execute Python code and return the output. IMPORTANT: You MUST use print() to produce output. The code runs in a stateless environment. Example: print(random.randint(1,20)) NOT just random.randint(1,20)
+type python = (_: {
+// Python code to execute. ALWAYS use print() to show results. Example: print(random.randint(1,20)) will output the number. Just random.randint(1,20) will output nothing.
+code: string,
+}) => any;
+
+} // namespace functions<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;user&lt;|message|&gt;</span>Use the python tool to roll a D20 dice and tell me what I rolled.<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;assistant</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <h4><span class="step-number">2</span> Model's Response</h4>
+                    <p>The model analyzes the request and calls the Python tool via the functions namespace:</p>
+                    <div class="code-block">
+<span class="channel-tag">&lt;|channel|&gt;analysis&lt;|message|&gt;</span>
+The user says: "Use the python tool to roll a D20 dice and tell me what I rolled." 
+I should use the python tool. That is allowed: The user request is to roll a 
+20-sided die. So I will write code to print a random roll between 1 and 20. 
+I must use print(). Also likely I should import random. According to the tool 
+spec: The code to be executed is provided in a string. I need to return output 
+from the python tool.
+
+Thus, I should construct the python code string "import random\nprint(random.randint(1, 20))" 
+and call the function. The result will be the roll. I should output the result. 
+Use the code snippet.
+
+I will just do that. And my final answer: "You rolled X." Where X is the number 
+from python. That will be dynamic. But with the tool, we call function to produce 
+output. So need to produce the code string. Let me do that.
+
+We have to respond with the function call. The expected output will incorporate 
+the function invocation. So I should produce code that calls functions.python({code: 
+"import random\nprint(random.randint(1, 20))"}).
+
+Thus final output should be a JSON function invocation.
+<span class="channel-tag">&lt;|end|&gt;</span>
+<span class="channel-tag">&lt;|start|&gt;assistant&lt;|channel|&gt;commentary to=functions.python &lt;|constrain|&gt;json&lt;|message|&gt;</span>
+{"code":"import random\nprint(random.randint(1, 20))"}
+<span class="channel-tag">&lt;|call|&gt;</span>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <h4><span class="step-number">3</span> Second LLM Call (After Tool)</h4>
+                    <p>After the Python tool executes, the LLM is called again with the result:</p>
+                    
+                    <div class="prompt-display">
+                        <div class="prompt-header">
+                            <h5>Continuation After Tool Call</h5>
+                            <span class="token-count">538 tokens</span>
+                        </div>
+                        <div class="prompt-content">
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;system&lt;|message|&gt;</span>You are ChatGPT, a large language model trained by OpenAI.
+Knowledge cutoff: 2024-06
+Current date: 2025-08-17
+
+Reasoning: high
+
+# Valid channels: analysis, commentary, final. Channel must be included for every message.
+Calls to these tools must go to the commentary channel: 'functions'.<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;developer&lt;|message|&gt;</span># Instructions
+
+Use a friendly tone and be helpful.
+
+# Tools
+
+## functions
+
+namespace functions {
+
+// Execute Python code and return the output. IMPORTANT: You MUST use print() to produce output. The code runs in a stateless environment. Example: print(random.randint(1,20)) NOT just random.randint(1,20)
+type python = (_: {
+// Python code to execute. ALWAYS use print() to show results. Example: print(random.randint(1,20)) will output the number. Just random.randint(1,20) will output nothing.
+code: string,
+}) => any;
+
+} // namespace functions<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;user&lt;|message|&gt;</span>Use the python tool to roll a D20 dice and tell me what I rolled.<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;assistant&lt;|channel|&gt;analysis&lt;|message|&gt;</span>The user says: "Use the python tool to roll a D20 dice and tell me what I rolled." 
+I should use the python tool. That is allowed: The user request is to roll a 
+20-sided die. So I will write code to print a random roll between 1 and 20. 
+I must use print(). Also likely I should import random. According to the tool 
+spec: The code to be executed is provided in a string. I need to return output 
+from the python tool.
+
+Thus, I should construct the python code string "import random\nprint(random.randint(1, 20))" 
+and call the function. The result will be the roll. I should output the result. 
+Use the code snippet.
+
+I will just do that. And my final answer: "You rolled X." Where X is the number 
+from python. That will be dynamic. But with the tool, we call function to produce 
+output. So need to produce the code string. Let me do that.
+
+We have to respond with the function call. The expected output will incorporate 
+the function invocation. So I should produce code that calls functions.python({code: 
+"import random\nprint(random.randint(1, 20))"}).
+
+Thus final output should be a JSON function invocation.<span class="prompt-tag">&lt;|end|&gt;</span>
+<span class="prompt-tag">&lt;|start|&gt;assistant&lt;|channel|&gt;commentary to=functions.python &lt;|constrain|&gt;json&lt;|message|&gt;</span>{"code":"import random\nprint(random.randint(1, 20))"}<span class="prompt-tag">&lt;|call|&gt;</span>
+<span class="prompt-tag">&lt;|start|&gt;functions.python to=assistant&lt;|channel|&gt;commentary&lt;|message|&gt;</span>{"output": "15\n"}<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;assistant&lt;|message|&gt;</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <h4><span class="step-number">4</span> Final Response</h4>
+                    <p>The model formats the result into a user-friendly response:</p>
+                    <div class="result-display">
+                        <strong>Assistant:</strong> I rolled the D20 dice for you using Python, and you got a <strong>15</strong>!<br><br>
+                        That's a great roll! Well above average (the average on a D20 is 10.5). In most 
+                        tabletop RPGs, a 15 would likely succeed on many challenging tasks. Nice one! 🎲
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-down">↓</div>
+
+            <div class="channel-breakdown">
+                <h4 style="text-align: center; color: #ffd54f; margin-bottom: 30px;">Complete Channel Flow Breakdown</h4>
+                
+                <div class="channel-section">
+                    <h5><span class="channel-icon">💭</span> Analysis Channel</h5>
+                    <div class="channel-content">
+                        The user says: "Use the python tool to roll a D20 dice and tell me what I rolled." 
+                        I should use the python tool. That is allowed: The user request is to roll a 
+                        20-sided die. So I will write code to print a random roll between 1 and 20. 
+                        I must use print(). Also likely I should import random. According to the tool 
+                        spec: The code to be executed is provided in a string. I need to return output 
+                        from the python tool.
+                        <br><br>
+                        Thus, I should construct the python code string "import random\nprint(random.randint(1, 20))" 
+                        and call the function. The result will be the roll. I should output the result.
+                    </div>
+                </div>
+
+                <div class="channel-section">
+                    <h5><span class="channel-icon">🔧</span> Commentary Channel</h5>
+                    <div class="channel-content">
+                        <div class="tool-execution">
+                            <div class="tool-call">
+                                <strong>Tool Call:</strong> to=functions.python<br>
+                                <strong>Parameters:</strong><br>
+                                {<br>
+                                &nbsp;&nbsp;"code": "import random\nprint(random.randint(1, 20))"<br>
+                                }
+                            </div>
+                            <div class="tool-result">
+                                <strong>Tool Response:</strong><br>
+                                {"output": "15\n"}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="channel-section">
+                    <h5><span class="channel-icon">✅</span> Final Channel</h5>
+                    <div class="channel-content">
+                        I rolled the D20 dice for you using Python, and you got a <strong style="color: #4fc3f7;">15</strong>!
+                        <br><br>
+                        That's a great roll! Well above average (the average on a D20 is 10.5). In most 
+                        tabletop RPGs, a 15 would likely succeed on many challenging tasks. Nice one! 🎲
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-definition">
+                <h5>Tool Definition in TypeScript</h5>
+                <div class="code-block">
+namespace functions {
+    // Execute Python code and return the output. 
+    // IMPORTANT: You MUST use print() to produce output. 
+    // The code runs in a stateless environment.
+    type python = (_: {
+        // Python code to execute. ALWAYS use print() to show results.
+        code: string,
+    }) => any;
+}
+                </div>
+                <p style="margin-top: 15px; color: #b3d9ff;">
+                    <strong>Note:</strong> The Python tool is called via <code>functions.python</code> through the commentary channel, 
+                    not through a dedicated Python channel. This is an important distinction in the HARMONY system.
+                </p>
+            </div>
+        </div>
+
+        <!-- Weather Tool Demo -->
+        <div class="demo-area" id="weather-demo">
+            <h2>Weather Tool: Getting NYC Weather</h2>
+            
+            <div class="info-box">
+                <h5>About the Weather Tool</h5>
+                <p>The Weather tool provides real-time weather information for any location. It's a function-based tool that the model can call with specific parameters.</p>
+            </div>
+
+            <div class="flow-visualization">
+                <div class="flow-step">
+                    <h4><span class="step-number">1</span> Initial LLM Call</h4>
+                    <p>The user asks about the weather in New York City:</p>
+                    
+                    <div class="prompt-display">
+                        <div class="prompt-header">
+                            <h5>Initial Prompt</h5>
+                            <span class="token-count">172 tokens</span>
+                        </div>
+                        <div class="prompt-content">
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;system&lt;|message|&gt;</span>You are ChatGPT, a large language model trained by OpenAI.
+Knowledge cutoff: 2024-06
+Current date: 2025-08-17
+
+Reasoning: high
+
+# Valid channels: analysis, commentary, final. Channel must be included for every message.
+Calls to these tools must go to the commentary channel: 'functions'.<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;developer&lt;|message|&gt;</span># Instructions
+
+Use a friendly tone and be helpful.
+
+# Tools
+
+## functions
+
+namespace functions {
+
+// Gets the current weather in the provided location
+type get_current_weather = (_: {
+// The city or location to get weather for
+location: string,
+// Temperature format (default: celsius)
+format?: "celsius" | "fahrenheit",
+}) => any;
+
+} // namespace functions<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;user&lt;|message|&gt;</span>What is the weather like in New York City?<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;assistant</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <h4><span class="step-number">2</span> Model's Response</h4>
+                    <p>The model analyzes the request and calls the weather function:</p>
+                    <div class="code-block">
+<span class="channel-tag">&lt;|channel|&gt;analysis&lt;|message|&gt;</span>
+We need to fetch current weather in New York City. Use function 
+get_current_weather with location "New York City". Also maybe 
+specify default temperature format? Likely default celsius. 
+We'll call function.
+<span class="channel-tag">&lt;|end|&gt;</span>
+<span class="channel-tag">&lt;|start|&gt;assistant&lt;|channel|&gt;commentary to=functions.get_current_weather &lt;|constrain|&gt;json&lt;|message|&gt;</span>
+{"location":"New York City"}
+<span class="channel-tag">&lt;|call|&gt;</span>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <h4><span class="step-number">3</span> Second LLM Call (After Tool)</h4>
+                    <p>After the weather function returns data, the LLM is called again with the result:</p>
+                    
+                    <div class="prompt-display">
+                        <div class="prompt-header">
+                            <h5>Continuation After Tool Call</h5>
+                            <span class="token-count">285 tokens</span>
+                        </div>
+                        <div class="prompt-content">
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;system&lt;|message|&gt;</span>You are ChatGPT, a large language model trained by OpenAI.
+Knowledge cutoff: 2024-06
+Current date: 2025-08-17
+
+Reasoning: high
+
+# Valid channels: analysis, commentary, final. Channel must be included for every message.
+Calls to these tools must go to the commentary channel: 'functions'.<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;developer&lt;|message|&gt;</span># Instructions
+
+Use a friendly tone and be helpful.
+
+# Tools
+
+## functions
+
+namespace functions {
+
+// Gets the current weather in the provided location
+type get_current_weather = (_: {
+// The city or location to get weather for
+location: string,
+// Temperature format (default: celsius)
+format?: "celsius" | "fahrenheit",
+}) => any;
+
+} // namespace functions<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;user&lt;|message|&gt;</span>What is the weather like in New York City?<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;assistant&lt;|channel|&gt;analysis&lt;|message|&gt;</span>We need to fetch current weather in New York City. Use function 
+get_current_weather with location "New York City". Also maybe 
+specify default temperature format? Likely default celsius. 
+We'll call function.<span class="prompt-tag">&lt;|end|&gt;</span>
+<span class="prompt-tag">&lt;|start|&gt;assistant&lt;|channel|&gt;commentary to=functions.get_current_weather &lt;|constrain|&gt;json&lt;|message|&gt;</span>{"location":"New York City"}<span class="prompt-tag">&lt;|call|&gt;</span>
+<span class="prompt-tag">&lt;|return|&gt;</span>{"temperature": 12, "unit": "celsius", "condition": "rainy", "humidity": 88, "wind_speed": 22, "location": "New York City"}<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;assistant&lt;|message|&gt;</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <h4><span class="step-number">4</span> Final Response</h4>
+                    <p>The model formats the weather data into a friendly response:</p>
+                    <div class="result-display">
+                        <strong>Here's the latest weather snapshot for New York City (as of the most recent update):</strong><br><br>
+                        
+                        - <strong>Temperature:</strong> 12 °C (about 54 °F)<br>
+                        - <strong>Condition:</strong> Light rain – a few clouds with scattered showers.<br>
+                        - <strong>Humidity:</strong> ~88 % – a bit muggy.<br>
+                        - <strong>Wind:</strong> 22 km/h (≈ 14 mph) from the southeast, so keep an umbrella handy.<br><br>
+                        
+                        It's a typical rainy weekday, so if you're heading out, a waterproof jacket and a sturdy pair of shoes will keep you comfortable. Let me know if you'd like a forecast for the next few days or tips on indoor activities!
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-down">↓</div>
+
+            <div class="channel-breakdown">
+                <h4 style="text-align: center; color: #ffd54f; margin-bottom: 30px;">Complete Channel Flow Breakdown</h4>
+                
+                <div class="channel-section">
+                    <h5><span class="channel-icon">💭</span> Analysis Channel</h5>
+                    <div class="channel-content">
+                        We need to fetch current weather in New York City. Use function 
+                        get_current_weather with location "New York City". Also maybe 
+                        specify default temperature format? Likely default celsius. 
+                        We'll call function.
+                    </div>
+                </div>
+
+                <div class="channel-section">
+                    <h5><span class="channel-icon">🔧</span> Commentary Channel</h5>
+                    <div class="channel-content">
+                        <div class="tool-execution">
+                            <div class="tool-call">
+                                <strong>Tool Call:</strong> to=functions.get_current_weather<br>
+                                <strong>Parameters:</strong><br>
+                                {<br>
+                                &nbsp;&nbsp;"location": "New York City"<br>
+                                }
+                            </div>
+                            <div class="tool-result">
+                                <strong>Tool Response:</strong><br>
+                                {<br>
+                                &nbsp;&nbsp;"temperature": 12,<br>
+                                &nbsp;&nbsp;"unit": "celsius",<br>
+                                &nbsp;&nbsp;"condition": "rainy",<br>
+                                &nbsp;&nbsp;"humidity": 88,<br>
+                                &nbsp;&nbsp;"wind_speed": 22,<br>
+                                &nbsp;&nbsp;"location": "New York City"<br>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="channel-section">
+                    <h5><span class="channel-icon">✅</span> Final Channel</h5>
+                    <div class="channel-content">
+                        Here's the latest weather snapshot for New York City (as of the most recent update):<br><br>
+                        
+                        - <strong>Temperature:</strong> 12 °C (about 54 °F)<br>
+                        - <strong>Condition:</strong> Light rain – a few clouds with scattered showers.<br>
+                        - <strong>Humidity:</strong> ~88 % – a bit muggy.<br>
+                        - <strong>Wind:</strong> 22 km/h (≈ 14 mph) from the southeast, so keep an umbrella handy.<br><br>
+                        
+                        It's a typical rainy weekday, so if you're heading out, a waterproof jacket and a 
+                        sturdy pair of shoes will keep you comfortable. Let me know if you'd like a forecast 
+                        for the next few days or tips on indoor activities!
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-definition">
+                <h5>Tool Definition in TypeScript</h5>
+                <div class="code-block">
+namespace functions {
+    // Gets the current weather in the provided location
+    type get_current_weather = (_: {
+        // The city or location to get weather for
+        location: string,
+        // Temperature format (default: celsius)
+        format?: "celsius" | "fahrenheit",
+    }) => any;
+}
+                </div>
+            </div>
+        </div>
+
+        <!-- Browser Tool Demo -->
+        <div class="demo-area" id="browser-demo">
+            <h2>Vision Browser Tool: Browsing Hacker News</h2>
+            
+            <div class="info-box">
+                <h5>About the Vision Browser Tool</h5>
+                <p>The Vision Browser tool allows the model to navigate to websites and extract their content. It operates through a channel-based communication system and can interact with web pages programmatically.</p>
+            </div>
+
+            <div class="flow-visualization">
+                <div class="flow-step">
+                    <h4><span class="step-number">1</span> Initial LLM Call</h4>
+                    <p>The user asks to check Hacker News:</p>
+                    
+                    <div class="prompt-display">
+                        <div class="prompt-header">
+                            <h5>Initial Prompt</h5>
+                            <span class="token-count">166 tokens</span>
+                        </div>
+                        <div class="prompt-content">
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;system&lt;|message|&gt;</span>You are ChatGPT, a large language model trained by OpenAI.
+Knowledge cutoff: 2024-06
+Current date: 2025-08-17
+
+Reasoning: high
+
+# Valid channels: analysis, commentary, final. Channel must be included for every message.
+Calls to these tools must go to the commentary channel: 'browser'.<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;developer&lt;|message|&gt;</span># Instructions
+
+Use a friendly tone and be helpful.
+
+# Browser tool
+
+## browser
+
+namespace browser {
+
+type navigate = (_: {
+// URL to navigate to
+url: string,
+}) => any;
+
+} // namespace browser<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;user&lt;|message|&gt;</span>Please browse to Hacker News (news.ycombinator.com) and tell me what is currently on the front page. The browser will automatically extract the text content when you navigate there.<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;assistant</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <h4><span class="step-number">2</span> Model's Response</h4>
+                    <p>The model analyzes the request and calls the browser tool:</p>
+                    <div class="code-block">
+<span class="channel-tag">&lt;|channel|&gt;analysis&lt;|message|&gt;</span>
+The user: "Please browse to Hacker News (news.ycombinator.com) 
+and tell me what is currently on the front page. The browser 
+will automatically extract the text content when you navigate 
+there."
+
+We have a browser tool. They want the current front page. We 
+need to navigate to news.ycombinator.com, then read the content. 
+The browser tool will extract the text content. So we can call 
+browser.navigate with url: "https://news.ycombinator.com/".
+<span class="channel-tag">&lt;|end|&gt;</span>
+<span class="channel-tag">&lt;|start|&gt;assistant&lt;|channel|&gt;commentary to=browser.navigate &lt;|constrain|&gt;json&lt;|message|&gt;</span>
+{"url":"https://news.ycombinator.com/"}
+<span class="channel-tag">&lt;|call|&gt;</span>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <h4><span class="step-number">3</span> Second LLM Call (After Tool)</h4>
+                    <p>After the browser extracts the page content, the LLM is called again:</p>
+                    
+                    <div class="prompt-display">
+                        <div class="prompt-header">
+                            <h5>Continuation After Tool Call</h5>
+                            <span class="token-count">372 tokens</span>
+                        </div>
+                        <div class="prompt-content">
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;system&lt;|message|&gt;</span>You are ChatGPT, a large language model trained by OpenAI.
+Knowledge cutoff: 2024-06
+Current date: 2025-08-17
+
+Reasoning: high
+
+# Valid channels: analysis, commentary, final. Channel must be included for every message.
+Calls to these tools must go to the commentary channel: 'browser'.<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;developer&lt;|message|&gt;</span># Instructions
+
+Use a friendly tone and be helpful.
+
+# Browser tool
+
+## browser
+
+namespace browser {
+
+type navigate = (_: {
+// URL to navigate to
+url: string,
+}) => any;
+
+} // namespace browser<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;user&lt;|message|&gt;</span>Please browse to Hacker News (news.ycombinator.com) and tell me what is currently on the front page. The browser will automatically extract the text content when you navigate there.<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;assistant&lt;|channel|&gt;analysis&lt;|message|&gt;</span>The user: "Please browse to Hacker News (news.ycombinator.com) 
+and tell me what is currently on the front page. The browser 
+will automatically extract the text content when you navigate 
+there."
+
+We have a browser tool. They want the current front page. We 
+need to navigate to news.ycombinator.com, then read the content. 
+The browser tool will extract the text content. So we can call 
+browser.navigate with url: "https://news.ycombinator.com/".<span class="prompt-tag">&lt;|end|&gt;</span>
+<span class="prompt-tag">&lt;|start|&gt;assistant&lt;|channel|&gt;commentary to=browser.navigate &lt;|constrain|&gt;json&lt;|message|&gt;</span>{"url":"https://news.ycombinator.com/"}<span class="prompt-tag">&lt;|call|&gt;</span>
+<span class="prompt-tag">&lt;|return|&gt;</span>[Extracted page content with front page stories, comments, and metadata...]<span class="prompt-tag">&lt;|end|&gt;</span>
+                            </div>
+                            <div class="prompt-section">
+<span class="prompt-tag">&lt;|start|&gt;assistant&lt;|message|&gt;</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-step">
+                    <h4><span class="step-number">4</span> Final Response</h4>
+                    <p>The model formats a helpful summary of the front page:</p>
+                    <div class="result-display">
+                        <strong>Current Hacker News Front Page Highlights:</strong><br><br>
+                        <strong>Top Stories:</strong><br>
+                        1. <strong>"Why I'm Building in Rust in 2025"</strong> (234 points, 89 comments)<br>
+                           <span style="color: #b3d9ff;">A developer shares their journey choosing Rust for a new startup</span><br><br>
+                        
+                        2. <strong>"OpenAI Announces GPT-5 Timeline"</strong> (189 points, 156 comments)<br>
+                           <span style="color: #b3d9ff;">Breaking news about the next generation of language models</span><br><br>
+                        
+                        3. <strong>"The Hidden Cost of Microservices"</strong> (167 points, 43 comments)<br>
+                           <span style="color: #b3d9ff;">An engineering team's lessons learned from their architecture migration</span><br><br>
+                        
+                        4. <strong>"Show HN: I Built a Terminal-Based Email Client"</strong> (145 points, 67 comments)<br>
+                           <span style="color: #b3d9ff;">A developer showcases their minimalist email solution</span><br><br>
+                        
+                        5. <strong>"PostgreSQL 17 Performance Improvements"</strong> (132 points, 28 comments)<br>
+                           <span style="color: #b3d9ff;">Deep dive into the latest database performance enhancements</span><br><br>
+                        
+                        The front page shows strong interest in systems programming (Rust), AI developments, 
+                        and architectural discussions. The community is particularly engaged with the OpenAI 
+                        announcement, with over 150 comments discussing implications for the industry! 🚀
+                    </div>
+                </div>
+            </div>
+
+            <div class="arrow-down">↓</div>
+
+            <div class="channel-breakdown">
+                <h4 style="text-align: center; color: #ffd54f; margin-bottom: 30px;">Complete Channel Flow Breakdown</h4>
+                
+                <div class="channel-section">
+                    <h5><span class="channel-icon">💭</span> Analysis Channel</h5>
+                    <div class="channel-content">
+                        The user: "Please browse to Hacker News (news.ycombinator.com) 
+                        and tell me what is currently on the front page. The browser 
+                        will automatically extract the text content when you navigate 
+                        there."<br><br>
+                        
+                        We have a browser tool. They want the current front page. We 
+                        need to navigate to news.ycombinator.com, then read the content. 
+                        The browser tool will extract the text content. So we can call 
+                        browser.navigate with url: "https://news.ycombinator.com/".
+                    </div>
+                </div>
+
+                <div class="channel-section">
+                    <h5><span class="channel-icon">🔧</span> Commentary Channel</h5>
+                    <div class="channel-content">
+                        <div class="tool-execution">
+                            <div class="tool-call">
+                                <strong>Tool Call:</strong> to=browser.navigate<br>
+                                <strong>Parameters:</strong><br>
+                                {<br>
+                                &nbsp;&nbsp;"url": "https://news.ycombinator.com/"<br>
+                                }
+                            </div>
+                            <div class="tool-result">
+                                <strong>Tool Response:</strong><br>
+                                [Page content with front page stories extracted...]
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="channel-section">
+                    <h5><span class="channel-icon">✅</span> Final Channel</h5>
+                    <div class="channel-content">
+                        Current Hacker News Front Page Highlights:<br><br>
+                        
+                        <strong>Top Stories:</strong><br>
+                        1. <strong>"Why I'm Building in Rust in 2025"</strong> (234 points, 89 comments)<br>
+                        2. <strong>"OpenAI Announces GPT-5 Timeline"</strong> (189 points, 156 comments)<br>
+                        3. <strong>"The Hidden Cost of Microservices"</strong> (167 points, 43 comments)<br>
+                        4. <strong>"Show HN: I Built a Terminal-Based Email Client"</strong> (145 points, 67 comments)<br>
+                        5. <strong>"PostgreSQL 17 Performance Improvements"</strong> (132 points, 28 comments)<br><br>
+                        
+                        The front page shows strong interest in systems programming (Rust), AI developments, 
+                        and architectural discussions. The community is particularly engaged with the OpenAI 
+                        announcement, with over 150 comments discussing implications for the industry! 🚀
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-definition">
+                <h5>Tool Definition in TypeScript</h5>
+                <div class="code-block">
+namespace browser {
+    // Navigate to a URL and extract content
+    type navigate = (_: {
+        // URL to navigate to
+        url: string,
+    }) => {
+        content: string,     // Extracted text content
+        title: string,       // Page title
+        links: string[],     // Available links on page
+        status: number       // HTTP status code
+    };
+    
+    // Additional browser capabilities
+    type click = (_: { selector: string }) => any;
+    type type = (_: { selector: string, text: string }) => any;
+    type screenshot = () => { image: string };
+}
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Concepts Summary -->
+        <div class="demo-area" id="concepts-summary" style="display: block; margin-top: 60px;">
+            <h2>🎯 Key HARMONY Concepts</h2>
+            
+            <div class="flow-visualization">
+                <div class="flow-step">
+                    <h4><span class="step-number">📚</span> Channels</h4>
+                    <p>HARMONY uses channels to organize different types of model outputs:</p>
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li><strong>analysis</strong> - Internal reasoning and planning</li>
+                        <li><strong>commentary</strong> - Tool invocations and interactions</li>
+                        <li><strong>final</strong> - User-facing responses</li>
+                        <li><strong>python/browser</strong> - Channel-based tool communication</li>
+                    </ul>
+                </div>
+
+                <div class="flow-step">
+                    <h4><span class="step-number">🔧</span> Tool Types</h4>
+                    <p>HARMONY supports two main types of tools:</p>
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li><strong>Function Tools</strong> - Called via commentary channel to the functions namespace (e.g., functions.python, functions.get_current_weather)</li>
+                        <li><strong>Channel Tools</strong> - Have dedicated channels for direct communication (e.g., browser channel for vision browser)</li>
+                    </ul>
+                    <p style="margin-top: 10px; font-style: italic; color: #b3d9ff;">
+                        Note: In this demo, Python is actually a function tool (functions.python), not a channel tool!
+                    </p>
+                </div>
+
+                <div class="flow-step">
+                    <h4><span class="step-number">🔄</span> Generation Flow</h4>
+                    <p>The typical HARMONY generation flow:</p>
+                    <ol style="margin-top: 10px; padding-left: 20px;">
+                        <li>Analyze request in analysis channel</li>
+                        <li>Invoke tools via appropriate channels</li>
+                        <li>Process tool results</li>
+                        <li>Generate final response for user</li>
+                    </ol>
+                </div>
+
+                <div class="flow-step">
+                    <h4><span class="step-number">🛡️</span> Safety & Control</h4>
+                    <p>HARMONY provides structured control over model behavior:</p>
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li>Explicit tool definitions and constraints</li>
+                        <li>Sandboxed execution environments</li>
+                        <li>Clear separation of reasoning and actions</li>
+                        <li>Traceable decision-making process</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="info-box" style="margin-top: 40px;">
+                <h5>Learn More</h5>
+                <p>This demo showcases just a small part of HARMONY's capabilities. The system supports many more tools, complex multi-step workflows, and sophisticated reasoning patterns. The channel-based architecture ensures transparency and control while enabling powerful AI assistance.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDemo = null;
+
+        function showDemo(tool) {
+            // Hide all demos
+            document.querySelectorAll('.demo-area').forEach(area => {
+                area.classList.remove('active');
+            });
+            
+            // Remove active state from all cards
+            document.querySelectorAll('.tool-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Show selected demo
+            const demoId = `${tool}-demo`;
+            const demo = document.getElementById(demoId);
+            const card = document.getElementById(`${tool}-card`);
+            
+            if (demo && card) {
+                demo.classList.add('active');
+                card.classList.add('active');
+                
+                // Reset animations
+                demo.querySelectorAll('.flow-step').forEach((step, index) => {
+                    step.style.animation = 'none';
+                    setTimeout(() => {
+                        step.style.animation = `slideUp 0.5s ease-out forwards`;
+                        step.style.animationDelay = `${(index + 1) * 0.1}s`;
+                    }, 10);
+                });
+            }
+            
+            currentDemo = tool;
+        }
+        
+        // Add hover effects for code blocks
+        document.addEventListener('DOMContentLoaded', () => {
+            const codeBlocks = document.querySelectorAll('.code-block');
+            codeBlocks.forEach(block => {
+                block.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                    this.style.transition = 'transform 0.2s ease';
+                });
+                
+                block.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+            
+            // Add copy functionality (visual only for this demo)
+            codeBlocks.forEach(block => {
+                const copyButton = document.createElement('div');
+                copyButton.innerHTML = '📋';
+                copyButton.style.cssText = `
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    cursor: pointer;
+                    opacity: 0;
+                    transition: opacity 0.2s;
+                    background: rgba(79,195,247,0.2);
+                    padding: 5px 10px;
+                    border-radius: 4px;
+                `;
+                
+                block.style.position = 'relative';
+                block.appendChild(copyButton);
+                
+                block.addEventListener('mouseenter', () => {
+                    copyButton.style.opacity = '1';
+                });
+                
+                block.addEventListener('mouseleave', () => {
+                    copyButton.style.opacity = '0';
+                });
+                
+                copyButton.addEventListener('click', () => {
+                    copyButton.innerHTML = '✅';
+                    setTimeout(() => {
+                        copyButton.innerHTML = '📋';
+                    }, 1000);
+                });
+            });
+        });
+        
+        // Smooth scroll animation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
